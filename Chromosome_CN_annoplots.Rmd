@@ -1,0 +1,121 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+
+
+f1 <- colSums(copynumber > cutoff, na.rm = TRUE) / ncells
+    f2 <- -colSums(copynumber < cutoff, na.rm = TRUE) / ncells
+    if (is.null(maxf)) {
+      maxf <- ceiling(max(max(f1, max(abs(f2)))) / 0.1) * 0.1
+      if (maxf < 0.01) {
+        maxf <- 0.01
+      }
+    }
+    ha2 <- ComplexHeatmap::columnAnnotation(
+      dist2 = ComplexHeatmap::anno_barplot(
+        f1,
+        bar_width = 1,
+        gp = grid::gpar(col = “#E34A33”, fill = “#E34A33"),
+        axis_param = list(
+          at = c(round(maxf / 2, 2), maxf),
+          labels = c(paste0(round(maxf / 2, 2)), paste0(maxf))
+        ),
+        ylim = c(0, maxf),
+        border = FALSE,
+      ),
+      dist3 = ComplexHeatmap::anno_barplot(
+        f2,
+        bar_width = 1,
+        gp = grid::gpar(col = “#3182BD”, fill = “#3182BD”),
+        axis_param = list(
+          at = c(0.0, -round(maxf / 2, 2), -maxf),
+          labels = c(“0”, paste0(round(maxf / 2, 2)), paste0(maxf))
+        ),
+        ylim = c(-maxf, 0),
+        border = FALSE,
+      ),
+      show_annotation_name = FALSE,
+      height = grid::unit(1.4, “cm”)
+
+
+
+
+
+
+
+```
+
+
+```{r}
+#for each chromosome, create a gains & losses plot
+for (i in 1:22) {
+chr_sheet <- plboth[plboth$chr == i, ]        
+anno_gain = anno_barplot(chr_sheet$gain, border = FALSE, axis = FALSE)
+draw(anno_gain, test = paste("Chromosome", i))
+anno_loss = anno_barplot(-chr_sheet$loss, border = FALSE, axis = FALSE)
+draw(anno_loss, test = paste("Chromosome", i, "Loss"))
+}
+chr_sheet <- plboth[plboth$chr == "X", ]        
+anno_gain = anno_barplot(chr_sheet$gain, border = FALSE, axis = FALSE)
+draw(anno_gain, test ="Chromosome X")
+anno_loss = anno_barplot(-chr_sheet$loss, border = FALSE, axis = FALSE)
+draw(anno_loss, test = "Chromosome X Loss")
+
+```
+```{r}
+chr_sheet <- plboth[plboth$chr == 4, ]  
+cor.test(x=chr_sheet$gain, y=chr_sheet$loss, method = 'spearman')
+sum(chr_sheet$gain)/nrow(chr_sheet)
+sum(chr_sheet$loss)/nrow(chr_sheet)
+```
+```{r}
+
+## change cutoff to ploidy
+
+copynumber <- createCNmatrix(CNbins, field = state, wholegenome = TRUE,
+                                 fillnaplot = fillna, centromere = FALSE)
+
+
+
+ncells <- nrow(copynumber)
+f1 <- colSums(copynumber > 2, na.rm = TRUE) / ncells
+f2 <- -colSums(copynumber < 2, na.rm = TRUE) / ncells
+
+maxf <- ceiling(max(max(f1, max(abs(f2)))) / 0.1) * 0.1
+      if (maxf < 0.01) {
+        maxf <- 0.01
+      }
+
+
+ha2 <- columnAnnotation(
+      dist2 = anno_barplot(
+        f1,
+        bar_width = 1,
+        gp = gpar(col = '#E34A33', fill = '#E34A33'),
+        axis_param = list(
+          at = c(round(maxf / 2, 2), maxf),
+          labels = c(paste0(round(maxf / 2, 2)), paste0(maxf))
+        ),
+        ylim = c(0, maxf),
+        border = FALSE,
+      ),
+      dist3 = anno_barplot(
+        f2,
+        bar_width = 1,
+        gp = gpar(col = '#E34A33', fill = '#E34A33'),
+        axis_param = list(
+          at = c(0.0, -round(maxf / 2, 2), -maxf),
+          labels = c('0', paste0(round(maxf / 2, 2)), paste0(maxf))
+        ),
+        ylim = c(-maxf, 0),
+        border = FALSE,
+      ),
+      show_annotation_name = FALSE,
+      height = unit(1.4, 'cm'))
+
+```
+

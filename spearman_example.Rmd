@@ -1,0 +1,13 @@
+---
+title: "Spearman Correlation Comparison of PCAWG & Simulation"
+output: html_notebook
+---
+
+```{r}
+
+library(readxl)
+sampledata <- read_excel('/Users/rhea/Desktop/example_statcomparison.xlsx')
+cor.test(sampledata$pcawg_gains, sampledata$sim_gains, method = "spearman", exact = FALSE)
+cor.test(sampledata$pcawg_loss, sampledata$sim_loss, method = "spearman", exact = FALSE)
+var(sampledata$pcawg_gains, sampledata$sim_gains, na.rm=FALSE)
+```
